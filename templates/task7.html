@@ -1,0 +1,99 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Range vs Time</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css"> 
+    <!-- Load Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>     
+<body>
+    <div class="title">Range from Launch Point</div>
+    <div class="text-container">
+        Challenge #7: A curious fact is that the range of a projectile from the launch point (let&rsquo;s set this to be (0,0) for convenience) plotted against time can actually pass through a local maximum and then a minimum, before increasing with increasing gradient. Use the derivations on the next slide to recreate the above graphs. Work out the times, x, y, and r values for these maxima and minima and plot these via a marker such as a *.
+    </div>
+    <div class="slider-container">
+        <input class="slider" id="angle-slider-blue" type="range" min="0" max="90" step="1" value="60" oninput="updatePlot()"> 
+        <span id="angle-value-blue">Angle (Blue): 60 degrees</span> 
+    </div>         
+    <div class="slider-container"> 
+         
+        <input class="slider" id="angle-slider-green" type="range" min="0" max="90" step="1" value="70" oninput="updatePlot()"> 
+        <span id="angle-value-green">Angle (Green): 70 degrees</span> 
+    </div>         
+    <div class="slider-container"> 
+          
+        <input class="slider" id="angle-slider-red" type="range" min="0" max="90" step="1" value="85" oninput="updatePlot()"> 
+        <span id="angle-value-red">Angle (Red): 85 degrees</span> 
+    </div>         
+    <div class="slider-container"> 
+          
+        <input class="slider" id="angle-slider-yellow" type="range" min="0" max="90" step="1" value="45" oninput="updatePlot()"> 
+        <span id="angle-value-yellow">Angle (Yellow): 45 degrees</span> 
+    </div>         
+    <div class="slider-container"> 
+        
+        <input class="slider" id="speed-slider" type="range" min="1" max="20" step="1" value="10" oninput="updatePlot()"> 
+        <span id="speed-value">Speed: 10 m/s</span> 
+    </div>         
+    
+    <div id="plot1"></div>         
+    <div> </div>
+    <div> </div>
+  
+    <div id="plot2"></div>         
+    <script>
+
+    function initializePlot() {
+        fetch('/initial_plot_data').then(function(response) {
+            return response.json();
+        }).then(function(data) {
+            Plotly.newPlot('plot1', JSON.parse(data.plot1), {}, {responsive: true});
+            Plotly.newPlot('plot2', JSON.parse(data.plot2), {}, {responsive: true});
+        });
+    }
+
+
+    window.onload = function() {
+        initializePlot(); 
+        updatePlot();     
+    };
+
+    function updatePlot() {
+        var angleBlue = document.getElementById('angle-slider-blue').value;
+        var angleGreen = document.getElementById('angle-slider-green').value;
+        var angleRed = document.getElementById('angle-slider-red').value;
+        var angleYellow = document.getElementById('angle-slider-yellow').value;
+        var speed = document.getElementById('speed-slider').value;
+
+        document.getElementById('angle-value-blue').innerText = 'Angle (Blue): ' + angleBlue + ' degrees';
+        document.getElementById('angle-value-green').innerText = 'Angle (Green): ' + angleGreen + ' degrees';
+        document.getElementById('angle-value-red').innerText = 'Angle (Red): ' + angleRed + ' degrees';
+        document.getElementById('angle-value-yellow').innerText = 'Angle (Yellow): ' + angleYellow + ' degrees';
+        document.getElementById('speed-value').innerText = 'Speed: ' + speed + ' m/s';
+
+        fetch('/update_7', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                angle_blue: angleBlue,
+                angle_green: angleGreen,
+                angle_red: angleRed,
+                angle_yellow: angleYellow,
+                speed: speed
+            })
+        }).then(function(response) {
+            return response.json();
+        }).then(function(data) {
+            Plotly.react('plot1', JSON.parse(data.plot1));
+            Plotly.react('plot2', JSON.parse(data.plot2));
+        });
+    }
+    </script>         
+</body>     
+</html>

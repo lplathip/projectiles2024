@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time and Distance of Flight</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <div class="title">Exact Projectile Motion Model</div>
+    <div class="text-container">Challenge #4: Create a new projectile model which compares a trajectory to the trajectory which maximizes horizontal range given the same launch height and launch speed. Inputs are u, h, g, and θ.</div>
+    <div class="text-container">Challenge #6: Now update your projectile model with a calculation of the distance travelled by the projectile i.e. the length of the inverted parabolic arc.</div>
+    <div class="slider-container">
+        <label class="slider-label" for="speed">Launch Speed (u):</label>
+        <input type="range" id="speed" name="speed" min="1" max="100" step="1" value="10">
+        <span id="speedValue">10</span>
+    </div>
+    <div class="slider-container">
+        <label class="slider-label" for="angle">Launch Angle (θ):</label>
+        <input type="range" id="angle" name="angle" min="0.0001" max="90" step="1" value="60">
+        <span id="angleValue">60</span>
+    </div>
+    <div class="slider-container">
+        <label class="slider-label" for="gravity">Gravity (g):</label>
+        <input type="range" id="gravity" name="gravity" min="1" max="20" step="0.1" value="9.81">
+        <span id="gravityValue">9.81</span>
+    </div>
+    <div class="slider-container">
+        <label class="slider-label" for="height">Launch Height (h):</label>
+        <input type="range" id="height" name="height" min="0" max="100" step="1" value="2">
+        <span id="heightValue">2</span>
+    </div>
+    <div id="graph"></div>
+    <div id="timeOfFlight">Time of Flight: </div>
+    <div id="maxTimeOfFlight">Maximum Range Time of Flight: </div>
+    <div id="arcLength">User-defined Arc Length: </div>
+    <div id="maxArcLength">Maximum Range Arc Length: </div>
+    <script>
+    function updateGraph() {
+        var formData = {
+            speed: $('#speed').val(),
+            angle: $('#angle').val(),
+            gravity: $('#gravity').val(),
+            height: $('#height').val()
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/update_4',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                var graph = JSON.parse(response.graphJSON);
+                Plotly.newPlot('graph', graph.data, graph.layout);
+                $('#timeOfFlight').text('Time of Flight: ' + response.time_of_flight.toFixed(2) + ' s');
+                $('#maxTimeOfFlight').text('Maximum Range Time of Flight: ' + response.max_time_of_flight.toFixed(2) + ' s');
+                $('#arcLength').text('User-defined Arc Length: ' + response.arc_length.toFixed(2) + ' m');
+                $('#maxArcLength').text('Maximum Range Arc Length: ' + response.max_arc_length.toFixed(2) + ' m');
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $('input[type="range"]').on('input', function() {
+            var id = $(this).attr('id');
+            $('#' + id + 'Value').text($(this).val());
+            updateGraph();
+        });
+
+        updateGraph(); 
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #000000; /* Set background color to black */
+    color: #ffffff; /* Set text color to white for better contrast */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.title {
+    color: #fe9900; /* Set text color to orange */
+    font-size: 2.5rem; /* Set font size to 2.5rem */
+    margin: 20px 0; /* Add margin for spacing */
+}
+
+.text-container {
+    max-width: 700px; /* Same max width as the plot boxes */
+    width: 100%; /* Ensure it fits the parent container's width */
+    margin: 0 auto; /* Center the text container */
+    text-align: center; /* Center-align the text */
+    overflow-wrap: break-word; /* Break words if necessary to prevent overflow */
+}
+
+.slider-container {
+    margin: 20px 0;
+}
+
+.slider-label {
+    display: inline-block;
+    width: 150px;
+}
+
+#graph, #plot1, #plot2, #plot {
+    width: 100%; /* Set width to 100% for responsiveness */
+    max-width: 700px; /* Set a max width */
+    height: 400px; /* Adjust height for smaller screens */
+    border-radius: 15px;
+    margin: 20px 0;
+    display: block;
+    overflow: hidden;
+    background-color: white;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 10px 0;
+}
+
+#timeOfFlight, #maxTimeOfFlight, #arcLength, #maxArcLength {
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+/* Media query for screens smaller than 600px */
+@media only screen and (max-width: 600px) {
+    body {
+        padding: 10px; /* Reduce padding on smaller screens */
+    }
+
+    h1 {
+        font-size: 20px; /* Adjust font size for headings */
+    }
+
+    .slider-label {
+        width: 100px; /* Adjust slider label width */
+    }
+
+    #graph, #plot1, #plot2, #plot {
+        height: 300px; /* Adjust height for smaller screens */
+    }
+
+    #timeOfFlight, #maxTimeOfFlight, #arcLength, #maxArcLength {
+        font-size: 16px; /* Adjust font size for text */
+    }
+
+    .iframe-container {
+        background-color: transparent;
+        width: 400px;
+        height: 300px;
+        margin: 0 auto;
+    }
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extension</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+    <style>
+        .iframe-container {
+            background-color: transparent;
+            width: 400px;
+            height: 300px;
+            margin: 0 auto;
+        }
+        iframe {
+            background-color: transparent;
+            border: none; /* Ensure there is no border */
+            width: 100%;
+            height: 100%;
+        }
+        .slider-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .button-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="title">Projectile Launched From A Spherical Planet</div>
+    <div class="subtitle">Simulation to find out latitude and longitude where the projectile lands, and its motion's animation.</div>
+    <div class="iframe-container">
+        <iframe id="glowIframe" src="/extensionGlowscript.html?speed=5500&latitude=52.36&longitude=1.17&vx=0.5953&vy=0.3304&vz=0.6014&mode=earth" frameborder="0" scrolling="no"></iframe>
+    </div>
+    <div class="note">(Hold right mouse button to rotate camera angle)</div>
+
+    <div class="slider-container">
+        <div class="input-group">
+            <label for="speedInput">Speed:</label>
+            <input type="number" id="speedInput" value="5500">
+        </div>
+        <div class="input-group">
+            <label for="latitudeInput">Latitude:</label>
+            <input type="number" id="latitudeInput" step="0.01" value="52.36">
+        </div>
+        <div class="input-group">
+            <label for="longitudeInput">Longitude:</label>
+            <input type="number" id="longitudeInput" step="0.01" value="1.17">
+        </div>
+        <div class="input-group">
+            <label for="vxInput">vx:</label>
+            <input type="number" id="vxInput" step="0.0001" value="0.5953">
+        </div>
+        <div class="input-group">
+            <label for="vyInput">vy:</label>
+            <input type="number" id="vyInput" step="0.0001" value="0.3304">
+        </div>
+        <div class="input-group">
+            <label for="vzInput">vz:</label>
+            <input type="number" id="vzInput" step="0.0001" value="0.6014">
+        </div>
+    </div>
+
+    <div class="radio-group">
+        <label>Select Planet:</label><br>
+        <input type="radio" id="earth" name="planet" value="earth" checked>
+        <label for="earth">Earth</label><br>
+        <input type="radio" id="moon" name="planet" value="moon">
+        <label for="moon">Moon</label><br>
+        <input type="radio" id="mars" name="planet" value="mars">
+        <label for="mars">Mars</label>
+    </div>
+
+    <div class="button-group">
+        <button onclick="updateIframe()">Update</button>
+    </div>
+
+    <script>
+        function updateIframe() {
+            var speed = document.getElementById('speedInput').value;
+            var latitude = document.getElementById('latitudeInput').value;
+            var longitude = document.getElementById('longitudeInput').value;
+            var vx = document.getElementById('vxInput').value;
+            var vy = document.getElementById('vyInput').value;
+            var vz = document.getElementById('vzInput').value;
+            var mode = document.querySelector('input[name="planet"]:checked').value; // Get selected planet
+            var iframe = document.getElementById('glowIframe');
+            var timestamp = new Date().getTime(); // Add timestamp to prevent caching
+            iframe.src = '/extensionGlowscript.html?speed=' + encodeURIComponent(speed) +
+                         '&latitude=' + encodeURIComponent(latitude) +
+                         '&longitude=' + encodeURIComponent(longitude) +
+                         '&vx=' + encodeURIComponent(vx) +
+                         '&vy=' + encodeURIComponent(vy) +
+                         '&vz=' + encodeURIComponent(vz) +
+                         '&mode=' + encodeURIComponent(mode) + // Add mode parameter
+                         '&_=' + timestamp; // Add timestamp parameter
+        }
+    </script>
+</body>
+
+</html>

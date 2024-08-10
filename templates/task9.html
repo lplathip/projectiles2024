@@ -1,0 +1,94 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <title>Projectile Motion with Drag</title>         
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>         
+        <link rel="stylesheet" href="static/css/styles.css">
+    </head>     
+    <body>
+        <div class="title">Effects of Air resistance</div>
+        <div></div>
+        <div class="text-container">Challenge #9: Write a new projectile model which compares a drag-free model (use what you have already done in previous challenges) with a model incorporating the effect of air resistance. Use a Verlet method to solve the air-resistance case</div>                                                
+                 
+        <div class="slider-container"> 
+            <label for="speed">Launch Speed (m/s): </label>             
+            <input type="range" id="speed" name="speed" min="1" max="100" value="30" oninput="updateGraph()"> 
+            <span id="speed_value">30</span> 
+        </div>
+        
+        <div class="slider-container"> 
+            <label for="angle">Launch Angle (degrees): </label>             
+            <input type="range" id="angle" name="angle" min="0" max="90" value="30" oninput="updateGraph()"> 
+            <span id="angle_value">30</span> 
+        </div>
+        
+        <div class="slider-container"> 
+            <label for="height">Launch Height (m): </label>             
+            <input type="range" id="height" name="height" min="0" max="10" value="2" step="0.1" oninput="updateGraph()"> 
+            <span id="height_value">2</span> 
+        </div>
+        
+        <div class="slider-container"> 
+            <label for="mass">Projectile Mass (kg): </label>             
+            <input type="range" id="mass" name="mass" min="0.01" max="1" value="0.1" step="0.01" oninput="updateGraph()"> 
+            <span id="mass_value">0.1</span> 
+        </div>
+        
+        <div class="slider-container"> 
+            <label for="drag">Coefficient of Drag: </label>             
+            <input type="range" id="drag" name="drag" min="0" max="1" value="0.47" step="0.01" oninput="updateGraph()"> 
+            <span id="drag_value">0.47</span> 
+        </div>
+        
+        <div class="slider-container"> 
+            <label for="area">Cross-sectional Area (m²): </label>             
+            <input type="range" id="area" name="area" min="0.001" max="0.1" value="0.01" step="0.001" oninput="updateGraph()"> 
+            <span id="area_value">0.01</span> 
+        </div>
+        <div></div>
+        <div id="graph"></div>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            updateGraph();
+        });
+
+        function updateGraph() {
+            const speed = document.getElementById('speed').value;
+            const angle = document.getElementById('angle').value;
+            const height = document.getElementById('height').value;
+            const mass = document.getElementById('mass').value;
+            const drag = document.getElementById('drag').value;
+            const area = document.getElementById('area').value;
+
+            document.getElementById('speed_value').innerText = speed;
+            document.getElementById('angle_value').innerText = angle;
+            document.getElementById('height_value').innerText = height;
+            document.getElementById('mass_value').innerText = mass;
+            document.getElementById('drag_value').innerText = drag;
+            document.getElementById('area_value').innerText = area;
+
+            fetch('/update_9', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    speed: speed,
+                    angle: angle,
+                    height: height,
+                    mass: mass,
+                    drag: drag,
+                    area: area
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const graphDiv = document.getElementById('graph');
+                Plotly.react(graphDiv, JSON.parse(data).data, JSON.parse(data).layout);
+            });
+        }
+    </script>         
+    </body>     
+</html>

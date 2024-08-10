@@ -1,0 +1,92 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+    <head> 
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+        <!-- Plotly.js -->         
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>         
+        <link rel="stylesheet" href="static/css/styles.css">      
+    </head>     
+    <body> 
+        <h1></h1>
+        <div class="title">High/Low Ball &amp; Minimum Speed to Target Point</div>
+        <h1></h1>
+
+        <div class="text-container">Challenge #3: Create a new projectile model which is based upon calculating trajectories
+            that are launched from (0,0) and pass through a fixed position (X,Y).</div>
+
+
+
+        <div class="text-container">Calculate the minimum
+            launch speed to achieve this, and hence determine &lsquo;low ball&rsquo; and &lsquo;high ball&rsquo; trajectories.</div>
+        <div class="text-container">Challenge #4: Create a new projectile model which compares a trajectory to the trajectory
+            which maximizes horizontal range given the same launch height and launch speed.</div>
+        <div class="text-container">Inputs
+            are u,h,g and thetha. For the maximum range trajectory you need to calculate the optimum angle.
+            For h &gt; 0 note this is not 45o</div>
+        <div class="text-container">Challenge #5: Update your projectile model of a trajectory which passes through (X,Y) with
+            the bounding parabola, in addition to minimum speed, max range and high and low ball
+            curves.</div>
+        <div class="text-container">The bounding parabola marks the region where possible (X,Y) coordinates could be
+            reached given u,h,g inputs.</div>
+
+        <form id="form"> 
+            <div class="slider-container"> 
+                <label for="X">Target X (m): <span id="X_val">{{ X }}</span>
+                </label>                 
+                <input type="range" min="500" max="2000" value="{{ X }}" class="slider" id="X" name="X" step="50" oninput="updateValue(this, 'X_val')"> 
+            </div>             
+            <div class="slider-container"> 
+                <label for="Y">Target Y (m): <span id="Y_val">{{ Y }}</span>
+                </label>                 
+                <input type="range" min="100" max="1000" value="{{ Y }}" class="slider" id="Y" name="Y" step="50" oninput="updateValue(this, 'Y_val')"> 
+            </div>             
+            <div class="slider-container"> 
+                <label for="h">Initial Height (m): <span id="h_val">{{ h }}</span>
+                </label>                 
+                <input type="range" min="0" max="500" value="{{ h }}" class="slider" id="h" name="h" step="10" oninput="updateValue(this, 'h_val')"> 
+            </div>             
+            <div class="slider-container"> 
+                <label for="g">Gravity (m/s²): <span id="g_val">{{ g }}</span>
+                </label>                 
+                <input type="range" min="1" max="20" value="{{ g }}" class="slider" id="g" name="g" step="0.1" oninput="updateValue(this, 'g_val')"> 
+            </div>             
+            <div class="slider-container"> 
+                <label for="u">Launch Speed (m/s): <span id="u_val">{{ u }}</span>
+                </label>                 
+                <input type="range" min="50" max="300" value="{{ u }}" class="slider" id="u" name="u" step="10" oninput="updateValue(this, 'u_val')"> 
+            </div>             
+        </form>         
+        <div id="plot"></div>         
+        <script>
+        function updateValue(slider, spanId) {
+            document.getElementById(spanId).innerText = slider.value;
+            updatePlot();
+        }
+
+        async function updatePlot() {
+            const X = document.getElementById('X').value;
+            const Y = document.getElementById('Y').value;
+            const h = document.getElementById('h').value;
+            const g = document.getElementById('g').value;
+            const u = document.getElementById('u').value;
+
+            const response = await fetch('/update_3', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ X, Y, h, g, u })
+            });
+
+            const data = await response.json();
+            const plot = JSON.parse(data.plot);
+            Plotly.react('plot', plot.data, plot.layout);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePlot();
+        });
+    </script>         
+    </body>     
+</html>

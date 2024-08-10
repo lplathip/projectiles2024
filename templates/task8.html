@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <div class="title">Coefficient Of Restitution</div>
+    <div class="text-container">Adjust the parameters below to simulate projectile motion with bounces.</div>
+
+    <div class="slider-container">
+        <label class="slider-label" for="bounces">Bounces:</label>
+        <input id="bounces" type="range" min="1" max="10" value="5"> <span id="bouncesValue">5</span>
+    </div>
+
+    <div class="slider-container">
+        <label class="slider-label" for="e">Coefficient of Restitution (e):</label>
+        <input id="e" type="range" min="0" max="1" step="0.1" value="0.8"> <span id="eValue">0.8</span>
+    </div>
+
+    <div class="slider-container">
+        <label class="slider-label" for="initial_speed">Initial Speed (m/s):</label>
+        <input id="initial_speed" type="range" min="1" max="50" value="20"> <span id="initial_speedValue">20</span>
+    </div>
+
+    <div class="slider-container">
+        <label class="slider-label" for="launch_angle">Launch Angle (degrees):</label>
+        <input id="launch_angle" type="range" min="0" max="90" value="45"> <span id="launch_angleValue">45</span>
+    </div>
+
+    <button id="confirmButton">Confirm</button>
+    <div id="graph"></div>
+
+    <script>
+        function updateGraph() {
+            const bounces = $('#bounces').val();
+            const e = $('#e').val();
+            const initialSpeed = $('#initial_speed').val();
+            const launchAngle = $('#launch_angle').val();
+
+            $.ajax({
+                type: 'POST',
+                url: '/update_animated_8',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    bounces: bounces,
+                    e: e,
+                    initial_speed: initialSpeed,
+                    launch_angle: launchAngle
+                }),
+                success: function(data) {
+                    const fig = JSON.parse(data);
+                    Plotly.newPlot('graph', fig.data, fig.layout)
+                        .then(function() {
+                            Plotly.addFrames('graph', fig.frames);
+                            Plotly.animate('graph', fig.frames, {
+                                frame: { duration: 10, redraw: true },
+                                fromcurrent: true
+                            });
+                        });
+                }
+            });
+        }
+
+        $(document).ready(function() {
+
+            updateGraph();
+
+            $('#confirmButton').on('click', function() {
+                updateGraph();
+            });
+
+            $('input[type="range"]').on('input', function() {
+                const id = $(this).attr('id');
+                $('#' + id + 'Value').text($(this).val());
+            });
+        });
+    </script>
+</body>
+</html>
