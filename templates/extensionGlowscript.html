@@ -66,7 +66,7 @@
         var display = canvas;
         var scene = canvas();
         var box, compound, cone, cylinder, ellipsoid, extrusion, helix, points, pyramid, ring, simple_sphere, group, vec, sleep, update, paths, shapes, vertex, triangle, quad, distant_light, local_light, attach_trail, attach_arrow, attach_light, sqrt, pi, tan, asin, acos, atan, atan2, exp, log, pow, factorial, combin, button, radio, checkbox, slider, checkbox, text, download, degrees, get_library, read_local_file
-        var version, print, arange, __name__, type, ρσ_ls, G, planet_data, mode, planet, M, planet_radius, omega, rotationAngle, planet_sphere, latitude, longitude, phi, lambda_, z, x, y, projectile_radius, projectile, axis_length, shaftwidth, x_axis, y_axis, z_axis, vx, vy, vz, speed, direction, velocity, dt, tracer, tilt_angle, rotation_axis, counter, r, r_mag, g, gravitational_acceleration, net_acceleration;
+        var version, print, arange, __name__, type, ρσ_ls, G, planetDataDict, mode, planet, M, R, omega, rotationAngle, planetObject, latitude, longitude, phi, lambda_, z, x, y, r, projectile, axis_length, shaftwidth, x_axis, y_axis, z_axis, vx, vy, vz, speed, direction, velocity, dt, tracer, tiltAngle, rotationAxis, counter, r_mag, g, gravitational_acceleration, net_acceleration;
         version = ρσ_list_decorate([ "3.2", "glowscript" ]);
         Array.prototype['+'] = function(r) {return this.concat(r)}
         Array.prototype['*'] = function(r) {return __array_times_number(this, r)}
@@ -82,7 +82,7 @@
         "4";
         G = 6.674["*"](Math.pow(10, 11["-u"]()));
         "6";
-        planet_data = (function(){
+        planetDataDict = (function(){
             var ρσ_d = ρσ_dict();
             ρσ_d.set("earth", (function(){
                 var ρσ_d = ρσ_dict();
@@ -116,17 +116,17 @@
         "31";
         mode = params.mode;
         "34";
-        planet = ρσ_getitem(planet_data, mode);
+        planet = ρσ_getitem(planetDataDict, mode);
         "35";
         M = ρσ_getitem(planet, "mass");
         "36";
-        planet_radius = ρσ_getitem(planet, "radius");
+        R = ρσ_getitem(planet, "radius");
         "37";
         omega = ρσ_getitem(planet, "omega");
         "38";
         rotationAngle = ρσ_getitem(planet, "rotationAngle");
         "40";
-        planet_sphere = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), radius: planet_radius, texture: ρσ_getitem(planet, "texture")})]);
+        planetObject = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), radius: R, texture: ρσ_getitem(planet, "texture")})]);
         "43";
         latitude = params.latitude;
         "44";
@@ -136,19 +136,19 @@
         "48";
         lambda_ = (await radians(longitude));
         "51";
-        z = planet_radius["*"](cos(phi))["*"](cos(lambda_));
+        z = R["*"](cos(phi))["*"](cos(lambda_));
         "52";
-        x = planet_radius["*"](cos(phi))["*"](sin(lambda_));
+        x = R["*"](cos(phi))["*"](sin(lambda_));
         "53";
-        y = planet_radius["*"](sin(phi));
+        y = R["*"](sin(phi));
         "56";
-        projectile_radius = planet_radius["/"](100);
+        r = R["/"](100);
         "57";
-        projectile = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(x, y, z), radius: projectile_radius, color: color.red})]);
+        projectile = ρσ_interpolate_kwargs.call(this, sphere, [ρσ_desugar_kwargs({pos: vector(x, y, z), radius: r, color: color.red})]);
         "60";
-        axis_length = planet_radius["*"](1.5);
+        axis_length = R["*"](1.5);
         "61";
-        shaftwidth = planet_radius["*"](.01);
+        shaftwidth = R["*"](.01);
         "62";
         x_axis = ρσ_interpolate_kwargs.call(this, arrow, [ρσ_desugar_kwargs({pos: vector(0, 0, 0), axis: vector(axis_length, 0, 0), color: color.blue, shaftwidth: shaftwidth})]);
         "63";
@@ -178,9 +178,9 @@
         "83";
         tracer = ρσ_interpolate_kwargs.call(this, curve, [ρσ_desugar_kwargs({color: color.yellow})]);
         "86";
-        tilt_angle = (await radians(rotationAngle));
+        tiltAngle = (await radians(rotationAngle));
         "87";
-        rotation_axis = vector(sin(tilt_angle), cos(tilt_angle), 0);
+        rotationAxis = vector(sin(tiltAngle), cos(tiltAngle), 0);
         "90";
         counter = 0;
         "91";
@@ -188,9 +188,9 @@
             "92";
             (await rate(700));
             "95";
-            ρσ_interpolate_kwargs.call(planet_sphere, planet_sphere.rotate, [ρσ_desugar_kwargs({angle: omega["*"](dt), axis: rotation_axis})]);
+            ρσ_interpolate_kwargs.call(planetObject, planetObject.rotate, [ρσ_desugar_kwargs({angle: omega["*"](dt), axis: rotationAxis})]);
             "98";
-            r = projectile.pos["-"](1["*"](planet_sphere.pos));
+            r = projectile.pos["-"](1["*"](planetObject.pos));
             "99";
             r_mag = mag(r);
             "101";
@@ -208,7 +208,7 @@
             "112";
             counter=counter["+"](1);
             "114";
-            if (counter[">"](2) && r_mag["<"](planet_radius)) {
+            if (counter[">"](2) && r_mag["<"](R)) {
                 "115";
                 velocity = vector(0, 0, 0);
                 "116";

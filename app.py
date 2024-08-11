@@ -12,8 +12,8 @@ def home():
 
 
 #task1: simple projectile motion
-def compute_trajectory_1(u, theta_deg, g, h):
-    theta = np.deg2rad(theta_deg)
+def compute_trajectory_1(u, thetaDeg, g, h):
+    theta = np.deg2rad(thetaDeg)
     dt = 0.01
 
     vx = u * np.cos(theta)
@@ -61,8 +61,8 @@ def update_1():
     return jsonify(graphJSON)
 
 #task2: analytical model
-def compute_trajectory_2(g, theta_deg, u, h):
-    theta = np.deg2rad(theta_deg)
+def compute_trajectory_2(g, thetaDeg, u, h):
+    theta = np.deg2rad(thetaDeg)
     
     T = (u * np.sin(theta) + np.sqrt((u * np.sin(theta))**2 + 2 * g * h)) / g
     R = u * np.cos(theta) * T
@@ -85,11 +85,11 @@ def index_2():
 @app.route('/update_2', methods=['POST'])
 def update_2():
     g = float(request.json['gravity'])
-    theta_deg = float(request.json['angle'])
+    thetaDeg = float(request.json['angle'])
     u = float(request.json['speed'])
     h = float(request.json['height'])
     
-    x_values, y_values, xa, ya, T = compute_trajectory_2(g, theta_deg, u, h)
+    x_values, y_values, xa, ya, T = compute_trajectory_2(g, thetaDeg, u, h)
     
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=x_values, y=y_values, mode='lines', name='Trajectory'))
@@ -108,16 +108,16 @@ def update_2():
 def calculateMinimumLaunchAngleAndSpeed_3(X=1000, Y=300, h=0, g=9.81):
     a = Y - h
     b = np.sqrt(X**2 + (Y - h)**2)
-    min_u_squared = g * (a + b)
+    minUSquared = g * (a + b)
     
-    if min_u_squared <= 0:
+    if minUSquared <= 0:
         print("no min speed")
     
-    min_u = np.sqrt(min_u_squared)
+    minU = np.sqrt(minUSquared)
     
     theta = np.arctan((a + b) / X)
-    theta_deg = np.degrees(theta)
-    return min_u, theta_deg
+    thethaDeg = np.degrees(theta)
+    return minU, thethaDeg
 
 def calculate_launch_angles_3(X=1000, Y=300, h=0, g=9.81, u=150):
 
@@ -130,21 +130,21 @@ def calculate_launch_angles_3(X=1000, Y=300, h=0, g=9.81, u=150):
         return None, None
     
     discriminant_sqrt = np.sqrt(discriminant)
-    angle1_rad = np.arctan((-b + discriminant_sqrt) / (2 * a))
-    angle2_rad = np.arctan((-b - discriminant_sqrt) / (2 * a))
-    angle1_deg = np.degrees(angle1_rad)
-    angle2_deg = np.degrees(angle2_rad)
-    low_ball_angle = min(angle1_deg, angle2_deg)
-    high_ball_angle = max(angle1_deg, angle2_deg)
+    angle1Rad = np.arctan((-b + discriminant_sqrt) / (2 * a))
+    angle2Rad = np.arctan((-b - discriminant_sqrt) / (2 * a))
+    angle1Deg = np.degrees(angle1Rad)
+    angle2Deg = np.degrees(angle2Rad)
+    lowballAngle = min(angle1Deg, angle2Deg)
+    highballAngle = max(angle1Deg, angle2Deg)
 
-    return low_ball_angle, high_ball_angle
+    return lowballAngle, highballAngle
 
 def get_trajectory_data_3(angle, u, h, g):
 
-    angle_rad = np.radians(angle)
+    angleRad = np.radians(angle)
     
     a = 0.5 * g
-    b = -u * np.sin(angle_rad)
+    b = -u * np.sin(angleRad)
     c = -h
 
     discriminant = b**2 - 4 * a * c
@@ -154,40 +154,40 @@ def get_trajectory_data_3(angle, u, h, g):
     T = (-b + np.sqrt(discriminant)) / (2 * a)
     
     tMax = np.linspace(0, T, num=100)
-    xCords = u * np.cos(angle_rad) * tMax
-    yCords = h + u * np.sin(angle_rad) * tMax - 0.5 * g * tMax**2
+    xCords = u * np.cos(angleRad) * tMax
+    yCords = h + u * np.sin(angleRad) * tMax - 0.5 * g * tMax**2
     
     mask = yCords >= 0 #for formatting (so graph doesnt go below y = 0)
     return xCords[mask], yCords[mask]
 
 def plot_projectile_trajectories_3(X=1000, Y=300, h=0, g=9.81, u=150):
-    low_ball_angle, high_ball_angle = calculate_launch_angles_3(X, Y, h, g, u)
+    lowBallAngle, highBallAngle = calculate_launch_angles_3(X, Y, h, g, u)
 
     fig = go.Figure()
 
-    if low_ball_angle is not None and high_ball_angle is not None:
+    if lowBallAngle is not None and highBallAngle is not None:
 
-        x_high, y_high = get_trajectory_data_3(high_ball_angle, u, h, g)
-        fig.add_trace(go.Scatter(x=x_high, y=y_high, mode='lines', name=f'High Ball Trajectory ({high_ball_angle:.1f}°)'))
+        xHigh, yHigh = get_trajectory_data_3(highBallAngle, u, h, g)
+        fig.add_trace(go.Scatter(x=xHigh, y=yHigh, mode='lines', name=f'High Ball Trajectory ({highBallAngle:.1f}°)'))
 
-        x_low, y_low = get_trajectory_data_3(low_ball_angle, u, h, g)
-        fig.add_trace(go.Scatter(x=x_low, y=y_low, mode='lines', name=f'Low Ball Trajectory ({low_ball_angle:.1f}°)'))
+        xLow, Llow = get_trajectory_data_3(lowBallAngle, u, h, g)
+        fig.add_trace(go.Scatter(x=xLow, y=Llow, mode='lines', name=f'Low Ball Trajectory ({lowBallAngle:.1f}°)'))
 
-    min_u, theta_deg = calculateMinimumLaunchAngleAndSpeed_3(X, Y, h, g)
-    x_min, y_min = get_trajectory_data_3(theta_deg, min_u, h, g)
-    fig.add_trace(go.Scatter(x=x_min, y=y_min, mode='lines', name=f'Minimum Launch Trajectory ({theta_deg:.1f}°)'))
+    minU, thethaDeg = calculateMinimumLaunchAngleAndSpeed_3(X, Y, h, g)
+    xMin, yMin = get_trajectory_data_3(thethaDeg, minU, h, g)
+    fig.add_trace(go.Scatter(x=xMin, y=yMin, mode='lines', name=f'Minimum Launch Trajectory ({thethaDeg:.1f}°)'))
 
     #bouding trajectory
-    x_bound = np.linspace(0, 10 * X, num=100)
-    y_bound = h + (u**2) / (2 * g) - (g / (2 * u**2)) * x_bound**2
-    mask_bound = y_bound >= 0  # filtering formating
-    fig.add_trace(go.Scatter(x=x_bound[mask_bound], y=y_bound[mask_bound], mode='lines', name='Bounding Parabola'))
+    xBoundCords = np.linspace(0, 10 * X, num=100)
+    yBoundCords = h + (u**2) / (2 * g) - (g / (2 * u**2)) * xBoundCords**2
+    maskBound = yBoundCords >= 0  # filtering formating
+    fig.add_trace(go.Scatter(x=xBoundCords[maskBound], y=yBoundCords[maskBound], mode='lines', name='Bounding Parabola'))
 
     
-    max_horizontal_angle = np.arcsin(1/np.sqrt(2+2*g*h/(u**2)))
-    max_horizontal_angle_deg = np.degrees(max_horizontal_angle)
-    x_max, y_max = get_trajectory_data_3(max_horizontal_angle_deg, u, h, g)
-    fig.add_trace(go.Scatter(x=x_max, y=y_max, mode='lines', name=f'Maximum Horizontal Path ({max_horizontal_angle_deg:.1f}°)'))
+    maxHorizontalAngle = np.arcsin(1/np.sqrt(2+2*g*h/(u**2)))
+    maxHorizontalAngleDeg = np.degrees(maxHorizontalAngle)
+    x_max, y_max = get_trajectory_data_3(maxHorizontalAngleDeg, u, h, g)
+    fig.add_trace(go.Scatter(x=x_max, y=y_max, mode='lines', name=f'Maximum Horizontal Path ({maxHorizontalAngleDeg:.1f}°)'))
 
     fig.add_trace(go.Scatter(x=[X], y=[Y], mode='markers', marker=dict(color='white', size=10), name=f'Target Point ({X}, {Y})'))
 
@@ -230,20 +230,20 @@ def update_3():
 
 # Task 4: Arc Length and Time of Flight
 def calculateArcLengthOfProjectile(u, theta, g, h):
-    theta_rad = np.radians(theta)
-    X = (u**2 / g) * (np.sin(theta_rad) * np.cos(theta_rad) + np.cos(theta_rad) * np.sqrt(np.sin(theta_rad)**2 + 2 * g * h / u**2))
-    tan_theta = np.tan(theta_rad)
-    lower_limit = tan_theta - (g * X / u**2) * (1 + tan_theta**2)
-    upper_limit = tan_theta
+    thetaRad = np.radians(theta)
+    X = (u**2 / g) * (np.sin(thetaRad) * np.cos(thetaRad) + np.cos(thetaRad) * np.sqrt(np.sin(thetaRad)**2 + 2 * g * h / u**2))
+    tanTheta = np.tan(thetaRad)
+    lowerLimit = tanTheta - (g * X / u**2) * (1 + tanTheta**2)
+    upperLimit = tanTheta
 
-    def integral_part(z):
+    def integralPart(z):
         return 0.5 * np.log(np.abs(np.sqrt(1 + z**2) + z)) + 0.5 * z * np.sqrt(1 + z**2)
 
-    arc_length = ((u**2) / (g * (1 + tan_theta**2))) * (integral_part(upper_limit) - integral_part(lower_limit))
-    return arc_length
+    arcLength = ((u**2) / (g * (1 + tanTheta**2))) * (integralPart(upperLimit) - integralPart(lowerLimit))
+    return arcLength
 
-def compute_trajectory_4(g, theta_deg, u, h):
-    theta = np.deg2rad(theta_deg)
+def compute_trajectory_4(g, thetaDeg, u, h):
+    theta = np.deg2rad(thetaDeg)
     
     T = (u * np.sin(theta) + np.sqrt((u * np.sin(theta))**2 + 2 * g * h)) / g
     R = u * np.cos(theta) * T
@@ -268,10 +268,10 @@ def compute_trajectory_4(g, theta_deg, u, h):
     
     TMax = (u * np.sin(thethaMax) + np.sqrt((u * np.sin(thethaMax))**2 + 2 * g * h)) / g
     
-    arc_length = calculateArcLengthOfProjectile(u, theta_deg, g, h)
-    arc_length_max = calculateArcLengthOfProjectile(u, np.degrees(thethaMax), g, h)
+    arcLength = calculateArcLengthOfProjectile(u, thetaDeg, g, h)
+    arcLengthMax = calculateArcLengthOfProjectile(u, np.degrees(thethaMax), g, h)
     
-    return (xCords, yCords, xa, ya, T, TMax, arc_length, arc_length_max, xMaxCords, yMaxCords)
+    return (xCords, yCords, xa, ya, T, TMax, arcLength, arcLengthMax, xMaxCords, yMaxCords)
 
 @app.route('/page4')
 def index_4():
@@ -351,7 +351,7 @@ def compute_min_max_times_7(u, g, angles):
             minMaxData.append((angle, t1, t2))
     return minMaxData
 
-double_height_times = compute_min_max_times_7(u, g, angles)
+minMaxTimes = compute_min_max_times_7(u, g, angles)
 
 # plot range vs time
 fig1 = go.Figure()
@@ -382,7 +382,7 @@ fig2.update_layout(
 )
 
 # Print min max points for X-Y graph (For debugging only)
-for angle, t1, t2 in double_height_times:
+for angle, t1, t2 in minMaxTimes:
     theta = np.deg2rad(angle)
     x1, y1 = calculate_displacements_7(t1, theta)
     x2, y2 = calculate_displacements_7(t2, theta)
@@ -442,9 +442,9 @@ def update_7():
     fig2.data = [trace for trace in fig2.data if 'Min Max Height' not in trace.name]
 
     # Calculate and add new min max points
-    double_height_times = compute_min_max_times_7(u, g, [angle_blue, angle_green, angle_red, angle_yellow])
+    minMaxTimes = compute_min_max_times_7(u, g, [angle_blue, angle_green, angle_red, angle_yellow])
 
-    for angle, t1, t2 in double_height_times:
+    for angle, t1, t2 in minMaxTimes:
         theta = np.deg2rad(angle)
         r1 = calculate_range_7(t1, theta)
         r2 = calculate_range_7(t2, theta)
@@ -504,9 +504,9 @@ def update_animated_8():
 
 
     vx, vy = v0_x, v0_y
-    bounce_count = 0
+    bounceCount = 0
 
-    while bounce_count < bounces:
+    while bounceCount < bounces:
         while y[-1] >= 0:
             x_new = x[-1] + vx * dt
             y_new = y[-1] + vy * dt - 0.5 * g * dt**2
@@ -519,7 +519,7 @@ def update_animated_8():
         if y[-1] < 0:
             y[-1] = 0  # reset to 0 so it doesnt goes through the floor
             vy = -e * vy  #applying cor in the opposite direction
-            bounce_count += 1
+            bounceCount += 1
 
     x = np.array(x)
     y = np.array(y)
@@ -606,14 +606,14 @@ def compute_trajectory_9(u, theta_deg, h, m, cd, A):
         ax = -vx * k * v
         ay = -g - vy * k * v  
 
-        x_new = x + vx * dt + 0.5 * ax * (dt**2)
-        y_new = y + vy * dt + 0.5 * ay * (dt**2)
+        xNew = x + vx * dt + 0.5 * ax * (dt**2)
+        yNew = y + vy * dt + 0.5 * ay * (dt**2)
         
-        vx_new = vx + ax * dt
-        vy_new = vy + ay * dt
+        vxNew = vx + ax * dt
+        vyNew = vy + ay * dt
         
-        x, y = x_new, y_new
-        vx, vy = vx_new, vy_new
+        x, y = xNew, yNew
+        vx, vy = vxNew, vyNew #overwriting old
         t += dt
         
         xCords.append(x)
@@ -623,16 +623,16 @@ def compute_trajectory_9(u, theta_deg, h, m, cd, A):
     xNoDragCords = [0]
     yNoDragCords = [h]
     
-    vx_no_drag = u * np.cos(theta)
-    vy_no_drag = u * np.sin(theta)
+    vxNoDrag = u * np.cos(theta)
+    vyNoDrag = u * np.sin(theta)
     x = 0
     y = h
     t = 0
     
     while y >= 0:
-        x += vx_no_drag * dt
-        y += vy_no_drag * dt - 0.5 * g * (dt**2)
-        vy_no_drag -= g * dt
+        x += vxNoDrag * dt
+        y += vyNoDrag * dt - 0.5 * g * (dt**2)
+        vyNoDrag -= g * dt
         t += dt
         
         xNoDragCords.append(x)
